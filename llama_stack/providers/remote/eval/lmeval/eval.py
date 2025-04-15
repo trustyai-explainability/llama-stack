@@ -193,8 +193,8 @@ class LMEvalCRBuilder:
             model_args.append(ModelArg(name="base_url", value=openai_base_url))
 
         model_args.append(ModelArg(name="tokenizer", value="google/flan-t5-base"))
-
-        model_args.append(ModelArg(name="batch_size", value="auto"))
+        # FIXME: batch_size is duplicated
+        # model_args.append(ModelArg(name="batch_size", value="auto"))
         model_args.append(ModelArg(name="num_concurrent", value="3"))
 
         env_vars = []
@@ -408,6 +408,7 @@ class LMEval(Eval, BenchmarksProtocolPrivate):
         logger.info(f"LMEval provider config values: {vars(self._config)}")
         self.benchmarks = {}
         self._jobs: List[Job] = []
+        self._job_metadata = {}
 
         self._k8s_client = None
         self._k8s_custom_api = None
@@ -610,6 +611,8 @@ class LMEval(Eval, BenchmarksProtocolPrivate):
 
             _job = Job(job_id=_job_id, status=JobStatus.scheduled, metadata={"created_at": str(time())})
             self._jobs.append(_job)
+            
+            self._job_metadata[_job_id] = {}
 
             # Deploy LMEvalJob
             try:
