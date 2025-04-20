@@ -38,7 +38,7 @@ async def get_adapter_impl(
             for arg in config.model_args:
                 if arg.get("name") == "base_url":
                     base_url = arg.get("value")
-                    logger.info(f"Using base_url from config: {base_url}")
+                    logger.debug(f"Using base_url from config: {base_url}")
                     break
 
         return LMEval(config=config)
