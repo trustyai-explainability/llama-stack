@@ -10,6 +10,8 @@ apis:
 - telemetry
 - tool_runtime
 - vector_io
+- files
+- benchmarks
 providers:
   inference:
   - provider_id: vllm-inference
@@ -55,6 +57,13 @@ providers:
     config:
         use_k8s: True
         base_url: ${env.VLLM_URL:=http://localhost:8000/v1}
+  - provider_id: trustyai_garak
+    provider_type: inline::trustyai_garak
+    config:
+      base_url: ${env.BASE_URL:=http://localhost:8321/v1} # llama-stack service base url
+      timeout: ${env.GARAK_TIMEOUT:=10800}
+      max_concurrent_jobs: ${env.GARAK_MAX_CONCURRENT_JOBS:=5}
+      tls_verify: ${env.GARAK_TLS_VERIFY:=true}
   datasetio:
   - provider_id: huggingface
     provider_type: remote::huggingface
@@ -106,6 +115,14 @@ providers:
   - provider_id: model-context-protocol
     provider_type: remote::model-context-protocol
     config: {}
+  files:
+  - provider_id: meta-reference-files
+    provider_type: inline::localfs
+    config:
+      storage_dir: /opt/app-root/src/.llama/distributions/trustyai/files
+      metadata_store:
+        type: sqlite
+        db_path: /opt/app-root/src/.llama/distributions/trustyai/registry.db
 metadata_store:
   type: sqlite
   db_path: /opt/app-root/src/.llama/distributions/trustyai/registry.db
@@ -127,7 +144,43 @@ shields: []
 vector_dbs: []
 datasets: []
 scoring_fns: []
-benchmarks: []
+benchmarks:
+- benchmark_id: quick
+  dataset_id: garak
+  scoring_functions:
+    - garak_scoring
+  provider_id: trustyai_garak
+  provider_benchmark_id: quick
+- benchmark_id: standard
+  dataset_id: garak
+  scoring_functions:
+    - garak_scoring
+  provider_id: trustyai_garak
+  provider_benchmark_id: standard
+- benchmark_id: owasp_llm_top10
+  dataset_id: garak
+  scoring_functions:
+    - garak_scoring
+  provider_id: trustyai_garak
+  provider_benchmark_id: owasp_llm_top10
+- benchmark_id: avid_security
+  dataset_id: garak
+  scoring_functions:
+    - garak_scoring
+  provider_id: trustyai_garak
+  provider_benchmark_id: avid_security
+- benchmark_id: avid_ethics
+  dataset_id: garak
+  scoring_functions:
+    - garak_scoring
+  provider_id: trustyai_garak
+  provider_benchmark_id: avid_ethics
+- benchmark_id: avid_performance
+  dataset_id: garak
+  scoring_functions:
+    - garak_scoring
+  provider_id: trustyai_garak
+  provider_benchmark_id: avid_performance
 tool_groups:
 - toolgroup_id: builtin::websearch
   provider_id: tavily-search
