@@ -1,0 +1,13 @@
+module: llama_stack_provider_trustyai_garak
+config_class: llama_stack_provider_trustyai_garak.config.GarakEvalProviderConfig
+pip_packages:
+  - garak==0.12.0
+  - llama_stack_provider_trustyai_garak==0.1.1
+api_dependencies:
+  - inference
+  - files
+  - benchmarks
+optional_api_dependencies:
+  - safety
+  - shields
+  - telemetry
