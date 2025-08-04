@@ -20,3 +20,4 @@ Llama Stack uses GitHub Actions for Continous Integration (CI). Below is a table
 | Test External API and Providers | [test-external.yml](test-external.yml) | Test the External API and Provider mechanisms |
 | Unit Tests | [unit-tests.yml](unit-tests.yml) | Run the unit test suite |
 | Update ReadTheDocs | [update-readthedocs.yml](update-readthedocs.yml) | Update the Llama Stack ReadTheDocs site |
+| Build and Push Docker Image | [docker-build.yml](docker-build.yml) | Build and push Docker image to quay.io/trustyai/llama-stack:latest on PR merge |
