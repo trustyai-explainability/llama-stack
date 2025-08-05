@@ -145,6 +145,8 @@ WORKDIR /app
 # We install the Python 3.12 dev headers and build tools so that any
 # C-extension wheels (e.g. polyleven, faiss-cpu) can compile successfully.
 
+USER root
+
 RUN dnf -y update && dnf install -y iputils git net-tools wget \
     vim-minimal python3.12 python3.12-pip python3.12-wheel \
     python3.12-setuptools python3.12-devel gcc make && \
@@ -324,6 +326,16 @@ fi
 RUN pip uninstall -y uv
 EOF
 
+# Create directories and set permissions as root before switching to non-root user
+add_to_container << EOF
+RUN mkdir -p /.llama /.cache && chmod -R g+rw /app /.llama /.cache
+EOF
+
+# Switch to non-root user after all package installations and directory setup
+add_to_container << EOF
+USER 1001
+EOF
+
 # If a run config is provided, we use the --config flag
 if [[ -n "$run_config" ]]; then
   add_to_container << EOF
@@ -335,12 +347,6 @@ elif [[ "$template_or_config" != *.yaml ]]; then
 ENTRYPOINT ["python", "-m", "llama_stack.distribution.server.server", "--template", "$template_or_config"]
 EOF
 fi
-
-# Add other require item commands genearic to all containers
-add_to_container << EOF
-
-RUN mkdir -p /.llama /.cache && chmod -R g+rw /app /.llama /.cache
-EOF
 
 printf "Containerfile created successfully in %s/Containerfile\n\n" "$TEMP_DIR"
 cat "$TEMP_DIR"/Containerfile

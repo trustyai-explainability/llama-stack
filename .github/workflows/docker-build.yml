@@ -47,7 +47,10 @@ jobs:
           USE_COPY_NOT_MOUNT=true LLAMA_STACK_DIR=. uv run llama stack build \
             --config trustyai-distribution/build.yaml \
             --image-type container \
-            --image-name quay.io/trustyai/llama-stack:latest
+            --image-name llama-stack-trustyai
+          
+          # Tag the built image with the full registry path
+          docker tag llama-stack-trustyai:dev quay.io/trustyai/llama-stack:latest
           
           # Also tag with commit SHA for versioning
           docker tag quay.io/trustyai/llama-stack:latest quay.io/trustyai/llama-stack:${{ github.sha }}
