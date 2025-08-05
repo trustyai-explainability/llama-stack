@@ -4,6 +4,8 @@
 FROM registry.access.redhat.com/ubi9/python-312:latest
 WORKDIR /opt/app-root
 
+# Switch to root for package installation
+USER root
 RUN pip install sqlalchemy # somehow sqlalchemy[asyncio] is not sufficient
 RUN pip install \
     aiosqlite \
@@ -28,7 +30,7 @@ RUN pip install \
     pandas \
     pillow \
     psycopg2-binary \
-    pymilvus>=2.4.10 \
+    pymilvus \
     pymongo \
     pypdf \
     redis \
@@ -43,6 +45,9 @@ RUN pip install \
 RUN pip install --index-url https://download.pytorch.org/whl/cpu torch torchvision
 RUN pip install --no-deps sentence-transformers
 RUN pip install --no-cache llama-stack==0.2.16
+
+# Switch back to non-root user
+USER 1001
 RUN mkdir -p ${HOME}/.llama/providers.d ${HOME}/.cache
 COPY trustyai-distribution/run.yaml ${APP_ROOT}/run.yaml
 COPY trustyai-distribution/providers.d/ ${HOME}/.llama/providers.d/
