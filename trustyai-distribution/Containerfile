@@ -11,26 +11,20 @@ RUN pip install \
     aiosqlite \
     autoevals \
     chardet \
-    datasets \
+    'datasets>=4.0.0' \
     fastapi \
     fire \
-    garak==0.12.0 \
     httpx \
-    kubernetes \
-    llama_stack_provider_lmeval==0.1.7 \
-    llama_stack_provider_trustyai_fms==0.1.4 \
-    llama_stack_provider_trustyai_garak==0.1.1 \
     matplotlib \
-    mcp>=1.8.1 \
+    'mcp>=1.8.1' \
     nltk \
     numpy \
-    openai \
     opentelemetry-exporter-otlp-proto-http \
     opentelemetry-sdk \
     pandas \
     pillow \
     psycopg2-binary \
-    pymilvus \
+    'pymilvus[milvus-lite]>=2.4.10' \
     pymongo \
     pypdf \
     redis \
@@ -42,14 +36,21 @@ RUN pip install \
     tqdm \
     transformers \
     uvicorn
-RUN pip install --index-url https://download.pytorch.org/whl/cpu torch torchvision
+RUN pip install \
+    llama_stack_provider_lmeval==0.2.4
+RUN pip install \
+    llama_stack_provider_trustyai_fms==0.2.2
+RUN pip install \
+    llama_stack_provider_trustyai_garak==0.1.4
+RUN pip install \
+    llama_stack_provider_trustyai_garak[remote]==0.1.4
+RUN pip install --extra-index-url https://download.pytorch.org/whl/cpu torch 'torchao>=0.12.0' torchvision
 RUN pip install --no-deps sentence-transformers
-RUN pip install --no-cache llama-stack==0.2.16
+RUN pip install --no-cache llama-stack==0.2.22
 
 # Switch back to non-root user
 USER 1001
-RUN mkdir -p ${HOME}/.llama/providers.d ${HOME}/.cache
+RUN mkdir -p ${HOME}/.llama ${HOME}/.cache
 COPY trustyai-distribution/run.yaml ${APP_ROOT}/run.yaml
-COPY trustyai-distribution/providers.d/ ${HOME}/.llama/providers.d/
 
-ENTRYPOINT ["python", "-m", "llama_stack.distribution.server.server", "--config", "/opt/app-root/run.yaml"]
+ENTRYPOINT ["python", "-m", "llama_stack.core.server.server", "/opt/app-root/run.yaml"]
