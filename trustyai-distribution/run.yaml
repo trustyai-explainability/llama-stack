@@ -80,7 +80,7 @@ providers:
         namespace: ${env.KUBEFLOW_NAMESPACE:=model-namespace}
         experiment_name: ${env.KUBEFLOW_EXPERIMENT_NAME:=trustyai-garak-scans}
         base_image: ${env.KUBEFLOW_BASE_IMAGE:=quay.io/rh-ee-spandraj/trustyai-garak-provider-dsp:cpu}
-  - provider_id: trustyai_ragas_inline
+  - provider_id: trustyai_ragas
     provider_type: inline::trustyai_ragas
     module: llama_stack_provider_ragas.inline
     config:
