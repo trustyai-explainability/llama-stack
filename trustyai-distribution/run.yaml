@@ -85,7 +85,7 @@ providers:
     module: llama_stack_provider_ragas.inline
     config:
       embedding_model: ${env.EMBEDDING_MODEL}
-  - provider_id: trustyai_ragas_remote
+  - provider_id: trustyai_ragas
     provider_type: remote::trustyai_ragas
     module: llama_stack_provider_ragas
     config:
