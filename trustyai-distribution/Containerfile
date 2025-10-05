@@ -44,7 +44,7 @@ RUN pip install \
 RUN pip install \
     llama_stack_provider_ragas[remote]==0.3.0
 RUN pip install \
-    llama_stack_provider_trustyai_fms==0.2.2
+    --extra-index-url https://test.pypi.org/simple/ llama_stack_provider_trustyai_fms==0.2.3
 RUN pip install \
     llama_stack_provider_trustyai_garak==0.1.4
 RUN pip install \
@@ -55,6 +55,13 @@ RUN pip install --no-cache llama-stack==0.2.22
 
 # chown the work directories to the non-root user to create garak scan log files
 RUN chown -R 1001:1001 ${APP_ROOT}
+# Make the Garak provider package directory writable for scan files
+RUN mkdir -p /opt/app-root/lib64/python3.12/site-packages/llama_stack_provider_trustyai_garak/_scan_files && \
+    chown -R 1001:1001 /opt/app-root/lib64/python3.12/site-packages/llama_stack_provider_trustyai_garak
+# Create Garak directories with full permissions (world-writable for debugging)
+RUN mkdir -p ${APP_ROOT}/src/.config/garak ${APP_ROOT}/src/.local/share/garak ${APP_ROOT}/src/.cache/garak/resources && \
+    chmod -R 777 ${APP_ROOT}/src/.config ${APP_ROOT}/src/.local ${APP_ROOT}/src/.cache && \
+    chown -R 1001:0 ${APP_ROOT}/src/.config ${APP_ROOT}/src/.local ${APP_ROOT}/src/.cache
 # Switch back to non-root user
 USER 1001
 RUN mkdir -p ${HOME}/.llama ${HOME}/.cache
