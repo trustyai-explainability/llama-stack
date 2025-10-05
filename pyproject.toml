@@ -88,7 +88,7 @@ unit = [
     "sqlalchemy[asyncio]>=2.0.41",
     "blobfile",
     "faiss-cpu",
-    "pymilvus",
+    "pymilvus>=2.5.12",
     "litellm",
     "together",
     "coverage",
@@ -113,7 +113,7 @@ test = [
     "sqlalchemy",
     "sqlalchemy[asyncio]>=2.0.41",
     "requests",
-    "pymilvus",
+    "pymilvus>=2.5.12",
     "reportlab",
 ]
 docs = [

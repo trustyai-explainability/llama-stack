@@ -13,7 +13,7 @@ import sys
 from pathlib import Path
 
 BASE_REQUIREMENTS = [
-    "llama-stack==0.2.16",
+    "llama-stack==0.2.22",
 ]
 
 
@@ -76,8 +76,24 @@ def get_dependencies():
                     cmd_parts = parts[:3]  # "RUN pip install"
                     packages = sorted(set(parts[3].split()))  # Sort the package names and remove duplicates
 
+                    # Add quotes to packages with > or < to prevent bash redirection
+                    packages = [
+                        f"'{package}'"
+                        if (">" in package or "<" in package)
+                        else package
+                        for package in packages
+                    ]
+
+                    # Modify pymilvus package to include milvus-lite extra
+                    packages = [
+                        package.replace("pymilvus", "pymilvus[milvus-lite]")
+                        if "pymilvus" in package
+                        else package
+                        for package in packages
+                    ]
+
                     # Determine command type and format accordingly
-                    if "--index-url" in line:
+                    if ("--index-url" in line) or ("--extra-index-url" in line):
                         full_cmd = " ".join(cmd_parts + [" ".join(packages)])
                         torch_deps.append(full_cmd)
                     elif "--no-deps" in line:
@@ -104,6 +120,7 @@ def get_dependencies():
     except subprocess.CalledProcessError as e:
         print(f"Error executing command: {e}")
         print(f"Command output: {e.output}")
+        print(f"Command stderr: {e.stderr}")
         sys.exit(1)
 
 

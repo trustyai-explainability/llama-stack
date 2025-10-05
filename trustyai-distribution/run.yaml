@@ -36,6 +36,7 @@ providers:
   safety:
     - provider_id: trustyai_fms
       provider_type: remote::trustyai_fms
+      module: llama_stack_provider_trustyai_fms==0.2.2
       config:
         orchestrator_url: ${env.FMS_ORCHESTRATOR_URL:=}
         ssl_cert_path: ${env.FMS_SSL_CERT_PATH:=}
@@ -54,16 +55,48 @@ providers:
   eval:
   - provider_id: trustyai_lmeval
     provider_type: remote::trustyai_lmeval
+    module: llama_stack_provider_lmeval==0.2.4
     config:
-        use_k8s: True
+        use_k8s: ${env.TRUSTYAI_LMEVAL_USE_K8S:=true}
         base_url: ${env.VLLM_URL:=http://localhost:8000/v1}
-  - provider_id: trustyai_garak
+  - provider_id: trustyai_garak_inline
     provider_type: inline::trustyai_garak
+    module: llama_stack_provider_trustyai_garak.inline
     config:
       base_url: ${env.BASE_URL:=http://localhost:8321/v1} # llama-stack service base url
       timeout: ${env.GARAK_TIMEOUT:=10800}
       max_concurrent_jobs: ${env.GARAK_MAX_CONCURRENT_JOBS:=5}
       tls_verify: ${env.GARAK_TLS_VERIFY:=true}
+  - provider_id: trustyai_garak_remote
+    provider_type: remote::trustyai_garak
+    module: llama_stack_provider_trustyai_garak.remote
+    config:
+      base_url: ${env.BASE_URL:=https://c11deb30887f.ngrok-free.app/v1} # llama-stack service base url (must be accessible from kf pods)
+      timeout: ${env.GARAK_TIMEOUT:=10800}
+      max_concurrent_jobs: ${env.GARAK_MAX_CONCURRENT_JOBS:=5}
+      tls_verify: ${env.GARAK_TLS_VERIFY:=true}
+      kubeflow_config:
+        pipelines_endpoint: ${env.KUBEFLOW_PIPELINES_ENDPOINT:=https://ds-pipeline-dspa-model-namespace.apps.rosa.y1m4j9o2e1n6b9l.r6mx.p3.openshiftapps.com}
+        namespace: ${env.KUBEFLOW_NAMESPACE:=model-namespace}
+        experiment_name: ${env.KUBEFLOW_EXPERIMENT_NAME:=trustyai-garak-scans}
+        base_image: ${env.KUBEFLOW_BASE_IMAGE:=quay.io/rh-ee-spandraj/trustyai-garak-provider-dsp:cpu}
+  - provider_id: trustyai_ragas
+    provider_type: inline::trustyai_ragas
+    module: llama_stack_provider_ragas.inline
+    config:
+      embedding_model: ${env.EMBEDDING_MODEL}
+  - provider_id: trustyai_ragas
+    provider_type: remote::trustyai_ragas
+    module: llama_stack_provider_ragas
+    config:
+      embedding_model: ${env.EMBEDDING_MODEL}
+      kubeflow_config:
+        results_s3_prefix: ${env.KUBEFLOW_RESULTS_S3_PREFIX}
+        s3_credentials_secret_name: ${env.KUBEFLOW_S3_CREDENTIALS_SECRET_NAME}
+        pipelines_endpoint: ${env.KUBEFLOW_PIPELINES_ENDPOINT}
+        namespace: ${env.KUBEFLOW_NAMESPACE}
+        llama_stack_url: ${env.KUBEFLOW_LLAMA_STACK_URL}
+        base_image: ${env.KUBEFLOW_BASE_IMAGE}
   datasetio:
   - provider_id: huggingface
     provider_type: remote::huggingface
@@ -144,42 +177,42 @@ shields: []
 vector_dbs: []
 datasets: []
 scoring_fns: []
-benchmarks:
-- benchmark_id: quick
+benchmarks: # TODO: Can a single benchmark be used for both inline and remote garak providers?
+- benchmark_id: trustyai_garak::quick
   dataset_id: garak
   scoring_functions:
     - garak_scoring
-  provider_id: trustyai_garak
+  provider_id: trustyai_garak_remote
   provider_benchmark_id: quick
-- benchmark_id: standard
+- benchmark_id: trustyai_garak::standard
   dataset_id: garak
   scoring_functions:
     - garak_scoring
-  provider_id: trustyai_garak
+  provider_id: trustyai_garak_remote
   provider_benchmark_id: standard
-- benchmark_id: owasp_llm_top10
+- benchmark_id: trustyai_garak::owasp_llm_top10
   dataset_id: garak
   scoring_functions:
     - garak_scoring
-  provider_id: trustyai_garak
+  provider_id: trustyai_garak_remote
   provider_benchmark_id: owasp_llm_top10
-- benchmark_id: avid_security
+- benchmark_id: trustyai_garak::avid_security
   dataset_id: garak
   scoring_functions:
     - garak_scoring
-  provider_id: trustyai_garak
+  provider_id: trustyai_garak_remote
   provider_benchmark_id: avid_security
-- benchmark_id: avid_ethics
+- benchmark_id: trustyai_garak::avid_ethics
   dataset_id: garak
   scoring_functions:
     - garak_scoring
-  provider_id: trustyai_garak
+  provider_id: trustyai_garak_remote
   provider_benchmark_id: avid_ethics
-- benchmark_id: avid_performance
+- benchmark_id: trustyai_garak::avid_performance
   dataset_id: garak
   scoring_functions:
     - garak_scoring
-  provider_id: trustyai_garak
+  provider_id: trustyai_garak_remote
   provider_benchmark_id: avid_performance
 tool_groups:
 - toolgroup_id: builtin::websearch
@@ -188,4 +221,4 @@ tool_groups:
   provider_id: rag-runtime
 server:
   port: 8321
-external_providers_dir: /opt/app-root/src/.llama/providers.d
+# external_providers_dir: /opt/app-root/src/.llama/providers.d
