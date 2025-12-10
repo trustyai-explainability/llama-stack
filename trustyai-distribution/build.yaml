@@ -16,9 +16,9 @@ distribution_spec:
     - provider_type: remote::trustyai_lmeval
       module: llama_stack_provider_lmeval==0.4.1
     - provider_type: inline::trustyai_garak
-      module: llama_stack_provider_trustyai_garak==0.1.6
+      module: llama_stack_provider_trustyai_garak[inline]==0.1.7
     - provider_type: remote::trustyai_garak
-      module: llama_stack_provider_trustyai_garak[remote]==0.1.6
+      module: llama_stack_provider_trustyai_garak==0.1.7
     - provider_type: inline::trustyai_ragas
       module: llama_stack_provider_ragas==0.5.1
     - provider_type: remote::trustyai_ragas

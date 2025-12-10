@@ -17,9 +17,16 @@ BASE_REQUIREMENTS = [
     "llama-stack==0.3.4",
 ]
 
-# TODO: Add other pinned dependencies from odh lls-distro
+# pinned dependencies from odh lls-distro
 PINNED_DEPENDENCIES = [
     "'langchain>=0.3.25,<1.0.0'",
+    "'kfp-kubernetes==2.14.6'",
+    "'pyarrow>=21.0.0'",
+    "'botocore==1.35.88'",
+    "'boto3==1.35.88'",
+    "'aiobotocore==2.16.1'",
+    "'ibm-cos-sdk-core==2.14.2'",
+    "'ibm-cos-sdk==2.14.2'",
 ]
 
 def check_llama_installed():
