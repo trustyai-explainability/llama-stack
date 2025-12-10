@@ -1,16 +1,19 @@
 FROM registry.access.redhat.com/ubi9/python-312:latest
 WORKDIR /opt/app-root
 
+# Switch to root for package installation
+USER root
+
 RUN pip install uv
 RUN pip install sqlalchemy # somehow sqlalchemy[asyncio] is not sufficient
 {dependencies}
 RUN pip install --no-cache llama-stack==0.3.4
 
-# # commenting to reduce image size
-# # chown the work directories to the non-root user to create garak scan log files
-# RUN chown -R 1001:1001 ${{APP_ROOT}}
+RUN mkdir -p ${{APP_ROOT}}/src/.llama/distributions/trustyai
+RUN chown -R 1001:1001 ${{APP_ROOT}}/src/.llama/distributions/trustyai
+
 # # Switch back to non-root user
-# USER 1001
+USER 1001
 RUN mkdir -p ${{HOME}}/.llama ${{HOME}}/.cache
 COPY trustyai-distribution/run.yaml ${{APP_ROOT}}/run.yaml
 COPY --chmod=755 trustyai-distribution/entrypoint.sh ${{APP_ROOT}}/entrypoint.sh
